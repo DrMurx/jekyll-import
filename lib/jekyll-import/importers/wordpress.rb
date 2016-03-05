@@ -21,6 +21,7 @@ module JekyllImport
         c.option 'table_prefix', '--table_prefix PREFIX', 'Table prefix name (default: "wp_")'
         c.option 'site_prefix', '--site_prefix PREFIX', 'Site prefix name (default: "")'
         c.option 'clean_entities', '--clean_entities', 'Whether to clean entities (default: true)'
+        c.option 'author', '--author', 'Whether the frontmatter author field is a structure (default: true)'
         c.option 'comments', '--comments', 'Whether to import comments (default: true)'
         c.option 'categories', '--categories', 'Whether to import categories (default: true)'
         c.option 'tags', '--tags', 'Whether to import tags (default: true)'
@@ -104,6 +105,7 @@ module JekyllImport
           :table_prefix   => opts.fetch('table_prefix', 'wp_'),
           :site_prefix    => opts.fetch('site_prefix', nil),
           :clean_entities => opts.fetch('clean_entities', true),
+          :author         => opts.fetch('author', true),
           :comments       => opts.fetch('comments', true),
           :categories     => opts.fetch('categories', true),
           :tags           => opts.fetch('tags', true),
@@ -202,6 +204,18 @@ module JekyllImport
           []
         end
 
+        author = if options[:author]
+          {
+            'display_name'=> post[:author].to_s,
+            'login'       => post[:author_login].to_s,
+            'email'       => post[:author_email].to_s,
+            'url'         => post[:author_url].to_s,
+          }
+        else
+          post[:author].to_s
+        end
+
+
         # Get the relevant fields as a hash, delete empty fields and
         # convert to YAML for the header.
         header = {
@@ -209,12 +223,7 @@ module JekyllImport
           'status'        => post[:status].to_s,
           'published'     => post[:status].to_s == 'draft' ? nil : (post[:status].to_s == 'publish'),
           'title'         => title.to_s,
-          'author'        => {
-            'display_name'=> post[:author].to_s,
-            'login'       => post[:author_login].to_s,
-            'email'       => post[:author_email].to_s,
-            'url'  => post[:author_url].to_s,
-          },
+          'author'        => author,
           'author_login'  => post[:author_login].to_s,
           'author_email'  => post[:author_email].to_s,
           'author_url'    => post[:author_url].to_s,
