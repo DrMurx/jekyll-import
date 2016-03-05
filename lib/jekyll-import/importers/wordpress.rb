@@ -85,9 +85,6 @@ module JekyllImport
           end
         end
 
-        FileUtils.mkdir_p("_posts")
-        FileUtils.mkdir_p("_drafts") if options[:status].include? :draft
-
         db = Sequel.mysql2(options[:dbname], :user => options[:user], :password => options[:pass],
                           :socket => options[:socket], :host => options[:host], :encoding => 'utf8')
 
