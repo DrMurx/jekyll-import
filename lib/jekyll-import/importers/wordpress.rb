@@ -229,6 +229,7 @@ module JekyllImport
           'author_url'    => post[:author_url].to_s,
           'excerpt'       => excerpt,
           'more_anchor'   => more_anchor,
+          'thumb'         => process_thumbnail(post[:id], db, options),
           'wordpress_id'  => post[:id],
           'wordpress_url' => post[:guid].to_s,
           'date'          => date.to_s,
@@ -331,6 +332,24 @@ module JekyllImport
         end
 
         comments.sort!{ |a,b| a['id'] <=> b['id'] }
+      end
+
+
+      def self.process_thumbnail(post_id, db, options)
+        px = options[:table_prefix]
+        sx = options[:site_prefix]
+
+        query = "
+          SELECT
+            mt.meta_value AS `thumb`
+          FROM #{px}#{sx}posts posts
+          JOIN #{px}#{sx}postmeta m ON posts.ID = m.post_id AND m.meta_key = '_thumbnail_id'
+          JOIN #{px}#{sx}posts pt ON m.meta_value = pt.id
+          JOIN #{px}#{sx}postmeta mt ON pt.ID = mt.post_id AND mt.meta_key = '_wp_attached_file'
+          WHERE
+            posts.ID = #{post_id}"
+
+        db[query].get(:thumb)
       end
 
 
