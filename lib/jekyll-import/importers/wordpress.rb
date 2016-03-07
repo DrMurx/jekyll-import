@@ -227,6 +227,8 @@ module JekyllImport
           'comments'      => options[:comments]   ? comments   : nil,
         }.delete_if { |k,v| v.nil? || v == '' }
 
+        content = Util.wpautop(content)
+
         {
           :slug        => slug,
           :date        => date,
@@ -383,7 +385,7 @@ module JekyllImport
           File.open(filename, "w") do |f|
             f.puts post[:frontmatter].to_yaml
             f.puts "---"
-            f.puts Util.wpautop(post[:content])
+            f.puts post[:content]
           end
         end
       end
