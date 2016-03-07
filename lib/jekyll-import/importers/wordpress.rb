@@ -328,7 +328,9 @@ module JekyllImport
           raw = post[:raw]
 
           post[:filename] = if raw[:type] == 'page'
-            page_path(raw[:id], page_name_list) + "index.#{options[:extension]}"
+            base_path = page_path(raw[:id], page_name_list).gsub(/(\A\/+|\/+\z)/, '')
+            base_path = "page_#{raw[:id]}" if base_path.empty?
+            "#{base_path}/index.#{options[:extension]}"
           elsif raw[:status] == 'draft'
             "_drafts/#{post[:slug]}.md"
           else
