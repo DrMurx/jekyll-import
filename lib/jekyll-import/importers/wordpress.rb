@@ -138,13 +138,15 @@ module JekyllImport
             users.user_url      AS `author_url`
           FROM #{px}#{sx}posts AS `posts`
             LEFT JOIN #{px}users AS `users`
-              ON posts.post_author = users.ID"
+              ON posts.post_author = users.ID
+          WHERE
+            post_type IN ('post', 'page')"
 
         if options[:status] and not options[:status].empty?
           status_where = options[:status].map do |s|
             "posts.post_status = '#{s.to_s}'"
           end.join(" OR ")
-          query << " WHERE #{status_where}"
+          query << " AND (#{status_where})"
         end
 
         posts = []
